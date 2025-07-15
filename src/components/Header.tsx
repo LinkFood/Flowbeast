@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { BarChart3, Database, Upload, MessageSquare, TrendingUp, LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const Header = () => {
+  const location = useLocation();
   const { user, signOut } = useAuth();
+
+  // Don't render header on auth page
+  if (location.pathname === '/auth') {
+    return null;
+  }
 
   return (
     <header className="bg-gradient-card border-b border-border shadow-terminal">
