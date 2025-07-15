@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      options_flow: {
+        Row: {
+          created_at: string
+          id: string
+          implied_volatility: number | null
+          open_interest: number | null
+          option_type: string
+          premium: number
+          score: number | null
+          spot_price: number | null
+          strike_price: number | null
+          ticker_symbol: string
+          time_of_trade: string
+          trade_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          implied_volatility?: number | null
+          open_interest?: number | null
+          option_type: string
+          premium: number
+          score?: number | null
+          spot_price?: number | null
+          strike_price?: number | null
+          ticker_symbol: string
+          time_of_trade: string
+          trade_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          implied_volatility?: number | null
+          open_interest?: number | null
+          option_type?: string
+          premium?: number
+          score?: number | null
+          spot_price?: number | null
+          strike_price?: number | null
+          ticker_symbol?: string
+          time_of_trade?: string
+          trade_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

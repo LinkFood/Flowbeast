@@ -2,10 +2,17 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, FileText, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { parseCSV, OptionsFlowRecord } from "@/lib/csvParser";
+import { useToast } from "@/hooks/use-toast";
 
 export const UploadSection = () => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [uploadStats, setUploadStats] = useState<{ processed: number; errors: number } | null>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -40,15 +47,112 @@ export const UploadSection = () => {
     }
   };
 
-  const handleFiles = (files: File[]) => {
+  const handleFiles = async (files: File[]) => {
     const csvFiles = files.filter(file => file.name.endsWith('.csv'));
-    if (csvFiles.length > 0) {
-      setUploadStatus('uploading');
-      // Simulate upload process
-      setTimeout(() => {
+    
+    if (csvFiles.length === 0) {
+      toast({
+        title: "No CSV files found",
+        description: "Please select valid CSV files to upload.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to upload CSV files.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadStatus('uploading');
+    setUploadStats(null);
+
+    try {
+      let totalProcessed = 0;
+      let totalErrors = 0;
+
+      for (const file of csvFiles) {
+        const parseResult = await parseCSV(file);
+        
+        if (!parseResult.success) {
+          totalErrors += parseResult.totalRecords;
+          toast({
+            title: `Failed to parse ${file.name}`,
+            description: parseResult.errors.slice(0, 3).join(', '),
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Insert data in batches
+        const batchSize = 1000;
+        const batches = [];
+        for (let i = 0; i < parseResult.data.length; i += batchSize) {
+          batches.push(parseResult.data.slice(i, i + batchSize));
+        }
+
+        for (const batch of batches) {
+          const dbRecords = batch.map((record: OptionsFlowRecord) => ({
+            user_id: user.id,
+            ...record,
+          }));
+
+          const { error } = await supabase
+            .from('options_flow')
+            .insert(dbRecords);
+
+          if (error) {
+            console.error('Database insert error:', error);
+            totalErrors += batch.length;
+          } else {
+            totalProcessed += batch.length;
+          }
+        }
+
+        if (parseResult.errors.length > 0) {
+          totalErrors += parseResult.errors.length;
+        }
+      }
+
+      setUploadStats({ processed: totalProcessed, errors: totalErrors });
+      
+      if (totalProcessed > 0) {
         setUploadStatus('success');
-        setTimeout(() => setUploadStatus('idle'), 3000);
-      }, 2000);
+        toast({
+          title: "Upload successful!",
+          description: `Processed ${totalProcessed} records${totalErrors > 0 ? ` with ${totalErrors} errors` : ''}`,
+        });
+      } else {
+        setUploadStatus('error');
+        toast({
+          title: "Upload failed",
+          description: "No records were successfully processed.",
+          variant: "destructive",
+        });
+      }
+
+      setTimeout(() => {
+        setUploadStatus('idle');
+        setUploadStats(null);
+      }, 5000);
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadStatus('error');
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        variant: "destructive",
+      });
+      
+      setTimeout(() => {
+        setUploadStatus('idle');
+        setUploadStats(null);
+      }, 3000);
     }
   };
 
@@ -107,7 +211,9 @@ export const UploadSection = () => {
                   {uploadStatus === 'success' && (
                     <div>
                       <p className="text-lg font-medium text-accent">Upload successful!</p>
-                      <p className="text-sm text-muted-foreground">Flow data added to database</p>
+                      <p className="text-sm text-muted-foreground">
+                        {uploadStats ? `${uploadStats.processed} records processed${uploadStats.errors > 0 ? `, ${uploadStats.errors} errors` : ''}` : 'Flow data added to database'}
+                      </p>
                     </div>
                   )}
                   {uploadStatus === 'error' && (
