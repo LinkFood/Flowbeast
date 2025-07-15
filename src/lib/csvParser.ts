@@ -130,23 +130,55 @@ export function parseCSV(file: File): Promise<ParseResult> {
     const errors: string[] = [];
     let totalRecords = 0;
 
+    console.log('Starting CSV parse for file:', file.name);
+
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      transformHeader: (header: string, index: number) => {
-        // Normalize headers on the fly
-        const normalized = header.toLowerCase().trim().replace(/\s+/g, '_');
-        return HEADER_MAPPING[normalized] || normalized;
+      dynamicTyping: false, // Keep everything as strings initially
+      transform: (value: string) => {
+        // Clean up values
+        return value ? value.toString().trim() : '';
       },
       complete: (results) => {
+        console.log('CSV parsing complete. Raw results:', results);
+        console.log('Headers found:', results.meta?.fields);
+        
         totalRecords = results.data.length;
         const validRecords: OptionsFlowRecord[] = [];
 
-        results.data.forEach((row: any, index: number) => {
+        // First, let's map the headers properly
+        const headerMapping: Record<string, string> = {};
+        if (results.meta?.fields) {
+          results.meta.fields.forEach(header => {
+            const normalized = header.toLowerCase().trim().replace(/\s+/g, '_');
+            const mappedHeader = HEADER_MAPPING[normalized] || normalized;
+            headerMapping[header] = mappedHeader;
+            console.log(`Header mapping: "${header}" -> "${mappedHeader}"`);
+          });
+        }
+
+        results.data.forEach((rawRow: any, index: number) => {
           try {
+            // Map the raw row to our normalized field names
+            const row: any = {};
+            Object.keys(rawRow).forEach(originalHeader => {
+              const mappedHeader = headerMapping[originalHeader] || originalHeader;
+              row[mappedHeader] = rawRow[originalHeader];
+            });
+
+            console.log(`Row ${index + 1} mapped data:`, row);
+
             // Check for required fields
             if (!row.time_of_trade || !row.ticker_symbol || !row.premium || !row.option_type || !row.trade_type) {
-              errors.push(`Row ${index + 1}: Missing required fields (time_of_trade, ticker_symbol, premium, option_type, trade_type)`);
+              const missingFields = [];
+              if (!row.time_of_trade) missingFields.push('time_of_trade');
+              if (!row.ticker_symbol) missingFields.push('ticker_symbol');
+              if (!row.premium) missingFields.push('premium');
+              if (!row.option_type) missingFields.push('option_type');
+              if (!row.trade_type) missingFields.push('trade_type');
+              
+              errors.push(`Row ${index + 1}: Missing required fields: ${missingFields.join(', ')}`);
               return;
             }
 

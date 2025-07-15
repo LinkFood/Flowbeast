@@ -48,9 +48,12 @@ export const UploadSection = () => {
   };
 
   const handleFiles = async (files: File[]) => {
+    console.log('handleFiles called with:', files);
+    
     const csvFiles = files.filter(file => file.name.endsWith('.csv'));
     
     if (csvFiles.length === 0) {
+      console.log('No CSV files found');
       toast({
         title: "No CSV files found",
         description: "Please select valid CSV files to upload.",
@@ -59,7 +62,10 @@ export const UploadSection = () => {
       return;
     }
 
+    console.log('CSV files to process:', csvFiles.map(f => f.name));
+
     if (!user) {
+      console.log('User not authenticated');
       toast({
         title: "Authentication required",
         description: "Please log in to upload CSV files.",
@@ -68,6 +74,7 @@ export const UploadSection = () => {
       return;
     }
 
+    console.log('Starting upload process...');
     setUploadStatus('uploading');
     setUploadStats(null);
 
@@ -76,7 +83,9 @@ export const UploadSection = () => {
       let totalErrors = 0;
 
       for (const file of csvFiles) {
+        console.log(`Processing file: ${file.name}`);
         const parseResult = await parseCSV(file);
+        console.log(`Parse result for ${file.name}:`, parseResult);
         
         if (!parseResult.success) {
           totalErrors += parseResult.totalRecords;
