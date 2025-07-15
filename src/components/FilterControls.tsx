@@ -36,9 +36,12 @@ export const FilterControls = ({
   onClearFilters,
   isLoading = false 
 }: FilterControlsProps) => {
-  const hasActiveFilters = Object.values(filters).some(value => 
-    value !== "" && value !== undefined
-  );
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    if (key === 'tradeType' || key === 'optionType') {
+      return value !== "" && value !== "all" && value !== undefined;
+    }
+    return value !== "" && value !== undefined;
+  });
 
   const updateFilter = (key: keyof FilterState, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -108,7 +111,7 @@ export const FilterControls = ({
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent className="bg-background border-border z-50">
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="sweep">SWEEP</SelectItem>
               <SelectItem value="block">BLOCK</SelectItem>
             </SelectContent>
@@ -123,7 +126,7 @@ export const FilterControls = ({
               <SelectValue placeholder="All Options" />
             </SelectTrigger>
             <SelectContent className="bg-background border-border z-50">
-              <SelectItem value="">All Options</SelectItem>
+              <SelectItem value="all">All Options</SelectItem>
               <SelectItem value="call">CALL</SelectItem>
               <SelectItem value="put">PUT</SelectItem>
             </SelectContent>

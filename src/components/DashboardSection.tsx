@@ -37,8 +37,8 @@ export const DashboardSection = () => {
     ticker: "",
     premiumMin: "",
     premiumMax: "",
-    tradeType: "",
-    optionType: "",
+    tradeType: "all",
+    optionType: "all",
     scoreMin: "",
     scoreMax: "",
     dateFrom: undefined,
@@ -116,11 +116,11 @@ export const DashboardSection = () => {
         query = query.lte('premium', parseFloat(filters.premiumMax));
       }
       
-      if (filters.tradeType) {
+      if (filters.tradeType && filters.tradeType !== "all") {
         query = query.eq('trade_type', filters.tradeType);
       }
       
-      if (filters.optionType) {
+      if (filters.optionType && filters.optionType !== "all") {
         query = query.eq('option_type', filters.optionType);
       }
       
@@ -159,8 +159,8 @@ export const DashboardSection = () => {
       ticker: "",
       premiumMin: "",
       premiumMax: "",
-      tradeType: "",
-      optionType: "",
+      tradeType: "all",
+      optionType: "all",
       scoreMin: "",
       scoreMax: "",
       dateFrom: undefined,
