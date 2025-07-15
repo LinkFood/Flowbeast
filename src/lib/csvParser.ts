@@ -116,6 +116,15 @@ function normalizeTradeType(value: string): string {
 
 function parseDateTime(value: string): string {
   try {
+    // Check if it's just time format (HH:MM:SS)
+    if (/^\d{1,2}:\d{2}:\d{2}$/.test(value.trim())) {
+      // If it's just time, assume it's today's date
+      const today = new Date();
+      const [hours, minutes, seconds] = value.trim().split(':').map(Number);
+      today.setHours(hours, minutes, seconds, 0);
+      return today.toISOString();
+    }
+    
     // Try to parse various date formats
     const date = new Date(value);
     if (isNaN(date.getTime())) {
@@ -123,8 +132,15 @@ function parseDateTime(value: string): string {
     }
     return date.toISOString();
   } catch {
-    // If parsing fails, return the original value - let the database handle it
-    return value;
+    // If parsing fails, create a timestamp with today's date and the provided time
+    if (/^\d{1,2}:\d{2}:\d{2}$/.test(value.trim())) {
+      const today = new Date();
+      const [hours, minutes, seconds] = value.trim().split(':').map(Number);
+      today.setHours(hours, minutes, seconds, 0);
+      return today.toISOString();
+    }
+    // Last resort: return current timestamp
+    return new Date().toISOString();
   }
 }
 
