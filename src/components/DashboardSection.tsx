@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { FilterControls, FilterState } from "@/components/FilterControls";
 import { FlowsTable } from "@/components/FlowsTable";
+import { FlowCharts } from "@/components/FlowCharts";
 
 interface OptionsFlowData {
   id: string;
@@ -249,6 +250,15 @@ export const DashboardSection = () => {
               <Clock className="w-8 h-8 text-info" />
             </div>
           </Card>
+        </div>
+
+        {/* Data Visualization Charts */}
+        <div className="mb-12">
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold mb-2">Flow Analytics & Trends</h3>
+            <p className="text-muted-foreground">Visual insights into your options flow patterns and market activity.</p>
+          </div>
+          <FlowCharts flows={filteredFlows} />
         </div>
 
         <div className="grid lg:grid-cols-4 gap-8">
