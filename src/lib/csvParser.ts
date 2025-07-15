@@ -106,8 +106,11 @@ function normalizeOptionType(value: string): string {
 
 function normalizeTradeType(value: string): string {
   const normalized = value.toLowerCase().trim();
+  // Handle common trade type variations
   if (normalized.includes('buy') || normalized === 'b') return 'buy';
   if (normalized.includes('sell') || normalized === 's') return 'sell';
+  // For BullFlow data, BLOCK and SWEEP are valid trade types
+  if (normalized === 'block' || normalized === 'sweep') return normalized;
   return normalized;
 }
 
@@ -196,13 +199,13 @@ export function parseCSV(file: File): Promise<ParseResult> {
             };
 
             // Validate option_type and trade_type
-            if (!['call', 'put'].includes(record.option_type)) {
-              errors.push(`Row ${index + 1}: Invalid option_type "${record.option_type}" (must be "call" or "put")`);
+            if (!['call', 'put', 'c', 'p'].includes(record.option_type.toLowerCase())) {
+              errors.push(`Row ${index + 1}: Invalid option_type "${record.option_type}" (must be "call", "put", "c", or "p")`);
               return;
             }
 
-            if (!['buy', 'sell'].includes(record.trade_type)) {
-              errors.push(`Row ${index + 1}: Invalid trade_type "${record.trade_type}" (must be "buy" or "sell")`);
+            if (!['buy', 'sell', 'block', 'sweep'].includes(record.trade_type.toLowerCase())) {
+              errors.push(`Row ${index + 1}: Invalid trade_type "${record.trade_type}" (must be "buy", "sell", "block", or "sweep")`);
               return;
             }
 
