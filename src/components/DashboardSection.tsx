@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { BarChart3, Filter, Search, TrendingUp, DollarSign, Clock, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { FilterControls, FilterState } from "@/components/FilterControls";
+import { FlowsTable } from "@/components/FlowsTable";
 
 interface OptionsFlowData {
   id: string;
@@ -22,6 +24,7 @@ interface OptionsFlowData {
 export const DashboardSection = () => {
   const { user } = useAuth();
   const [recentFlows, setRecentFlows] = useState<OptionsFlowData[]>([]);
+  const [filteredFlows, setFilteredFlows] = useState<OptionsFlowData[]>([]);
   const [stats, setStats] = useState({
     totalFlows: 0,
     totalPremium: 0,
@@ -29,6 +32,18 @@ export const DashboardSection = () => {
     avgScore: 0
   });
   const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    ticker: "",
+    premiumMin: "",
+    premiumMax: "",
+    tradeType: "",
+    optionType: "",
+    scoreMin: "",
+    scoreMax: "",
+    dateFrom: undefined,
+    dateTo: undefined,
+  });
 
   useEffect(() => {
     if (user) {
@@ -65,6 +80,7 @@ export const DashboardSection = () => {
       const avgScore = statsData?.filter(row => row.score !== null).reduce((sum, row, _, arr) => sum + (row.score || 0) / arr.length, 0) || 0;
 
       setRecentFlows(flows || []);
+      setFilteredFlows(flows || []);
       setStats({
         totalFlows,
         totalPremium,
@@ -76,6 +92,81 @@ export const DashboardSection = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFilters = async () => {
+    try {
+      setFilterLoading(true);
+      
+      let query = supabase
+        .from('options_flow')
+        .select('*')
+        .eq('user_id', user?.id);
+
+      // Apply filters
+      if (filters.ticker) {
+        query = query.ilike('ticker_symbol', `%${filters.ticker}%`);
+      }
+      
+      if (filters.premiumMin) {
+        query = query.gte('premium', parseFloat(filters.premiumMin));
+      }
+      
+      if (filters.premiumMax) {
+        query = query.lte('premium', parseFloat(filters.premiumMax));
+      }
+      
+      if (filters.tradeType) {
+        query = query.eq('trade_type', filters.tradeType);
+      }
+      
+      if (filters.optionType) {
+        query = query.eq('option_type', filters.optionType);
+      }
+      
+      if (filters.scoreMin) {
+        query = query.gte('score', parseFloat(filters.scoreMin));
+      }
+      
+      if (filters.scoreMax) {
+        query = query.lte('score', parseFloat(filters.scoreMax));
+      }
+      
+      if (filters.dateFrom) {
+        query = query.gte('time_of_trade', filters.dateFrom.toISOString());
+      }
+      
+      if (filters.dateTo) {
+        const endOfDay = new Date(filters.dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        query = query.lte('time_of_trade', endOfDay.toISOString());
+      }
+
+      const { data, error } = await query.order('premium', { ascending: false }).limit(1000);
+      
+      if (error) throw error;
+      
+      setFilteredFlows(data || []);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+    } finally {
+      setFilterLoading(false);
+    }
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      ticker: "",
+      premiumMin: "",
+      premiumMax: "",
+      tradeType: "",
+      optionType: "",
+      scoreMin: "",
+      scoreMax: "",
+      dateFrom: undefined,
+      dateTo: undefined,
+    });
+    setFilteredFlows(recentFlows);
   };
 
   const formatCurrency = (amount: number) => {
@@ -160,119 +251,22 @@ export const DashboardSection = () => {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Controls Panel */}
-          <Card className="p-6 bg-gradient-card border-border shadow-terminal">
-            <h3 className="font-semibold mb-6 flex items-center">
-              <Filter className="w-5 h-5 mr-2 text-primary" />
-              Filter & Search
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Ticker Symbol</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                  <input 
-                    type="text" 
-                    placeholder="e.g., AAPL, NVDA" 
-                    className="w-full pl-10 pr-4 py-2 bg-secondary border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Premium Range</label>
-                <select className="w-full p-2 bg-secondary border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option>All Premiums</option>
-                  <option>$100K - $1M</option>
-                  <option>$1M - $10M</option>
-                  <option>$10M+</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Trade Type</label>
-                <select className="w-full p-2 bg-secondary border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option>All Types</option>
-                  <option>SWEEP</option>
-                  <option>BLOCK</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Score Range</label>
-                <select className="w-full p-2 bg-secondary border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option>All Scores</option>
-                  <option>0.8 - 1.0</option>
-                  <option>0.6 - 0.8</option>
-                  <option>0.4 - 0.6</option>
-                </select>
-              </div>
-              
-              <Button variant="terminal" className="w-full mt-6">
-                Apply Filters
-              </Button>
-            </div>
-          </Card>
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Filter Controls */}
+          <FilterControls
+            filters={filters}
+            onFiltersChange={setFilters}
+            onApplyFilters={applyFilters}
+            onClearFilters={clearFilters}
+            isLoading={filterLoading}
+          />
 
-          {/* Recent Flows */}
-          <div className="lg:col-span-2">
-            <Card className="p-6 bg-gradient-card border-border shadow-terminal">
-              <h3 className="font-semibold mb-6">Recent High-Value Flows</h3>
-              
-              {recentFlows.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">No options flow data found.</p>
-                  <p className="text-sm text-muted-foreground mt-2">Upload a CSV file to see your data here.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {recentFlows.map((flow) => (
-                    <div key={flow.id} className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg border border-border">
-                      <div className="flex items-center space-x-4">
-                        <div className="text-center">
-                          <div className="font-bold text-lg">{flow.ticker_symbol}</div>
-                          <div className="text-xs text-muted-foreground">{formatTime(flow.time_of_trade)}</div>
-                        </div>
-                        
-                        <div className="flex flex-col">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <Badge variant={flow.option_type.toLowerCase().includes('c') ? 'default' : 'secondary'} className="text-xs">
-                              {flow.option_type.toUpperCase()}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              {flow.trade_type.toUpperCase()}
-                            </Badge>
-                            <span className="text-lg font-bold text-primary">{formatCurrency(flow.premium)}</span>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            Strike: {flow.strike_price ? `$${flow.strike_price}` : 'N/A'} • 
-                            Spot: {flow.spot_price ? `$${flow.spot_price.toFixed(2)}` : 'N/A'} • 
-                            Score: {flow.score || 'N/A'}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <Badge variant={flow.score && flow.score > 0.5 ? "default" : "secondary"} className="mb-2">
-                          {flow.score && flow.score > 0.5 ? "High Score" : "Monitor"}
-                        </Badge>
-                        <div className="text-xs text-muted-foreground">
-                          {flow.implied_volatility ? `IV: ${flow.implied_volatility}%` : 'No IV'}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              <div className="mt-6 text-center">
-                <Button variant="data" onClick={fetchDashboardData}>
-                  Refresh Data
-                </Button>
-              </div>
-            </Card>
+          {/* Filtered Results Table */}
+          <div className="lg:col-span-3">
+            <FlowsTable 
+              flows={filteredFlows} 
+              isLoading={filterLoading}
+            />
           </div>
         </div>
 
