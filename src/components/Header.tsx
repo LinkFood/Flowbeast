@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { BarChart3, Database, Upload, MessageSquare, TrendingUp } from "lucide-react";
+import { BarChart3, Database, Upload, MessageSquare, TrendingUp, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 export const Header = () => {
+  const { user, signOut } = useAuth();
+
   return (
     <header className="bg-gradient-card border-b border-border shadow-terminal">
       <div className="container mx-auto px-6 py-4">
@@ -35,9 +39,23 @@ export const Header = () => {
               <MessageSquare className="w-4 h-4 mr-2" />
               AI Chat
             </Button>
-            <Button variant="terminal" size="sm">
-              Get Started
-            </Button>
+            {user ? (
+              <>
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground mr-2">
+                  <User className="w-4 h-4" />
+                  <span>{user.email}</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button variant="terminal" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
       </div>
