@@ -12,7 +12,6 @@ import {
   Zap
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { AIAnalysisService } from "@/lib/aiAnalysis";
 
 interface AIInsight {
   id: string;
@@ -65,7 +64,6 @@ export const AIInsights = () => {
       void loadInsights();
     }
   }, [user, loadInsights]);
-
 
   const runQuickAnalysis = async () => {
     if (!user) return;
