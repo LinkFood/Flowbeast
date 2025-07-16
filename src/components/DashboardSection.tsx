@@ -62,7 +62,7 @@ export const DashboardSection = ({ researchFilters, selectedDate }: DashboardSec
     if (user) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, fetchDashboardData]);
 
   const fetchDashboardData = async () => {
     try {

@@ -29,9 +29,13 @@ interface ResearchStats {
   topMover: string | null;
 }
 
-export const ResearchHeader = () => {
+interface ResearchHeaderProps {
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
+}
+
+export const ResearchHeader = ({ selectedDate, onDateChange }: ResearchHeaderProps) => {
   const { user } = useAuth();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [stats, setStats] = useState<ResearchStats>({
     totalFlows: 0,
     uniqueTickers: 0,
@@ -184,7 +188,7 @@ export const ResearchHeader = () => {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={(date) => date && setSelectedDate(date)}
+                  onSelect={(date) => date && onDateChange(date)}
                   initialFocus
                 />
               </PopoverContent>

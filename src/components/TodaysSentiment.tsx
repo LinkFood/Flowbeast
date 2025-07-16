@@ -48,7 +48,7 @@ export const TodaysSentiment = ({ selectedDate }: TodaysSentimentProps) => {
     if (user) {
       analyzeTodaysSentiment();
     }
-  }, [user, selectedDate]);
+  }, [user, selectedDate, analyzeTodaysSentiment]);
 
   const analyzeTodaysSentiment = async () => {
     if (!user) return;
@@ -101,7 +101,7 @@ export const TodaysSentiment = ({ selectedDate }: TodaysSentimentProps) => {
       const tickerSentiment = flows.reduce((acc, flow) => {
         const ticker = flow.ticker_symbol;
         if (!acc[ticker]) {
-          acc[ticker] = { callPremium: 0, putPremium: 0, flows: [] };
+          acc[ticker] = { callPremium: 0, putPremium: 0, flows: [] as any[] };
         }
         
         if (flow.option_type.toLowerCase() === 'call' || flow.option_type.toLowerCase() === 'c') {
@@ -112,7 +112,7 @@ export const TodaysSentiment = ({ selectedDate }: TodaysSentimentProps) => {
         
         acc[ticker].flows.push(flow);
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, { callPremium: number; putPremium: number; flows: any[] }>);
 
       // Get top bullish and bearish tickers
       const tickerScores = Object.entries(tickerSentiment).map(([ticker, data]) => {

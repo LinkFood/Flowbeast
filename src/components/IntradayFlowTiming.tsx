@@ -44,7 +44,7 @@ export const IntradayFlowTiming = ({ selectedDate }: IntradayFlowTimingProps) =>
     if (user) {
       analyzeIntradayTiming();
     }
-  }, [user, selectedDate]);
+  }, [user, selectedDate, analyzeIntradayTiming]);
 
   const analyzeIntradayTiming = async () => {
     if (!user) return;
@@ -180,12 +180,12 @@ export const IntradayFlowTiming = ({ selectedDate }: IntradayFlowTimingProps) =>
     return `$${value.toFixed(1)}M`;
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-slate-800 p-3 rounded-lg border border-slate-700">
           <p className="text-white font-medium">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry: { name: string; value: number; color: string }, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {entry.name.includes('Premium') ? formatCurrency(entry.value) : entry.value}
             </p>

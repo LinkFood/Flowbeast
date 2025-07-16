@@ -12,7 +12,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-slate-950">
       <Header />
-      <ResearchHeader />
+      <ResearchHeader 
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+      />
       <div className="flex">
         <ResearchSidebar 
           onFiltersChange={setResearchFilters}

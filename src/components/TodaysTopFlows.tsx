@@ -55,7 +55,7 @@ export const TodaysTopFlows = ({ selectedDate }: TodaysTopFlowsProps) => {
     if (user) {
       analyzeTopFlows();
     }
-  }, [user, selectedDate]);
+  }, [user, selectedDate, analyzeTopFlows]);
 
   const analyzeTopFlows = async () => {
     if (!user) return;
