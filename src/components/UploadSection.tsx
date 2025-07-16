@@ -166,27 +166,19 @@ export const UploadSection = () => {
   };
 
   return (
-    <section className="container mx-auto px-6 py-16">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Upload Your BullFlow Data</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Drag and drop your daily BullFlow.io CSV exports to start building your historical options flow database.
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-8">
+    <div className="mb-6">
+      <div className="grid lg:grid-cols-3 gap-6">
           {/* Upload Area */}
-          <Card className="p-8">
+          <Card className="p-6 bg-slate-900 border-slate-800 lg:col-span-2">
             <div
-              className={`border-2 border-dashed rounded-lg p-12 text-center transition-all duration-300 ${
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
                 dragActive 
-                  ? 'border-primary bg-primary/5 scale-105' 
+                  ? 'border-blue-500 bg-blue-500/10 scale-105' 
                   : uploadStatus === 'success'
-                  ? 'border-accent bg-accent/5'
+                  ? 'border-green-500 bg-green-500/10'
                   : uploadStatus === 'error'
-                  ? 'border-destructive bg-destructive/5'
-                  : 'border-border hover:border-primary/50 hover:bg-primary/5'
+                  ? 'border-red-500 bg-red-500/10'
+                  : 'border-slate-600 hover:border-blue-500/50 hover:bg-blue-500/5'
               }`}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
@@ -204,38 +196,38 @@ export const UploadSection = () => {
               
               <div className="flex flex-col items-center space-y-4">
                 {uploadStatus === 'uploading' ? (
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
                 ) : uploadStatus === 'success' ? (
-                  <CheckCircle className="w-12 h-12 text-accent" />
+                  <CheckCircle className="w-10 h-10 text-green-500" />
                 ) : uploadStatus === 'error' ? (
-                  <AlertCircle className="w-12 h-12 text-destructive" />
+                  <AlertCircle className="w-10 h-10 text-red-500" />
                 ) : (
-                  <Upload className="w-12 h-12 text-muted-foreground" />
+                  <Upload className="w-10 h-10 text-slate-400" />
                 )}
                 
                 <div>
                   {uploadStatus === 'uploading' && (
-                    <p className="text-lg font-medium text-primary">Processing CSV files...</p>
+                    <p className="text-lg font-medium text-blue-400">Processing CSV files...</p>
                   )}
                   {uploadStatus === 'success' && (
                     <div>
-                      <p className="text-lg font-medium text-accent">Upload successful!</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-lg font-medium text-green-400">Upload successful!</p>
+                      <p className="text-sm text-slate-400">
                         {uploadStats ? `${uploadStats.processed} records processed${uploadStats.errors > 0 ? `, ${uploadStats.errors} errors` : ''}` : 'Flow data added to database'}
                       </p>
                     </div>
                   )}
                   {uploadStatus === 'error' && (
-                    <p className="text-lg font-medium text-destructive">Upload failed</p>
+                    <p className="text-lg font-medium text-red-400">Upload failed</p>
                   )}
                   {uploadStatus === 'idle' && (
                     <div>
-                      <p className="text-lg font-medium mb-2">Drop CSV files here</p>
-                      <p className="text-sm text-muted-foreground mb-4">
+                      <p className="text-lg font-medium mb-2 text-white">Drop CSV files here</p>
+                      <p className="text-sm text-slate-400 mb-4">
                         or click to browse your computer
                       </p>
                       <label htmlFor="file-upload">
-                        <Button variant="terminal" className="cursor-pointer">
+                        <Button className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white">
                           Select Files
                         </Button>
                       </label>
@@ -302,10 +294,62 @@ export const UploadSection = () => {
               <p className="text-sm opacity-90">
                 28,547 new flow records processed
               </p>
+          </Card>
+
+          {/* Upload Info */}
+          <div className="space-y-4">
+            <Card className="p-4 bg-slate-900 border-slate-800">
+              <h3 className="font-semibold mb-3 flex items-center text-white">
+                <FileText className="w-4 h-4 mr-2 text-blue-400" />
+                Upload Requirements
+              </h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
+                  BullFlow.io CSV exports
+                </li>
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
+                  End-of-day data only
+                </li>
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
+                  Max 50MB per file
+                </li>
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3" />
+                  Multiple files supported
+                </li>
+              </ul>
+            </Card>
+
+            <Card className="p-4 bg-slate-900 border-slate-800">
+              <h3 className="font-semibold mb-3 flex items-center text-white">
+                <TrendingUp className="w-4 h-4 mr-2 text-green-400" />
+                Research Features
+              </h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3" />
+                  Pattern detection
+                </li>
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3" />
+                  Unusualness scoring
+                </li>
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3" />
+                  Historical comparison
+                </li>
+                <li className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3" />
+                  Missed opportunities
+                </li>
+              </ul>
             </Card>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

@@ -7,9 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { FilterControls, FilterState } from "@/components/FilterControls";
 import { FlowsTable } from "@/components/FlowsTable";
+import { EnhancedFlowTable } from "@/components/EnhancedFlowTable";
 import { FlowCharts } from "@/components/FlowCharts";
 import { AIChat } from "@/components/AIChat";
 import { AIInsights } from "@/components/AIInsights";
+import { MissedOpportunities } from "@/components/MissedOpportunities";
 
 interface OptionsFlowData {
   id: string;
@@ -24,7 +26,12 @@ interface OptionsFlowData {
   implied_volatility: number | null;
 }
 
-export const DashboardSection = () => {
+interface DashboardSectionProps {
+  researchFilters?: Record<string, unknown>;
+  selectedDate?: Date;
+}
+
+export const DashboardSection = ({ researchFilters, selectedDate }: DashboardSectionProps) => {
   const { user } = useAuth();
   const [recentFlows, setRecentFlows] = useState<OptionsFlowData[]>([]);
   const [filteredFlows, setFilteredFlows] = useState<OptionsFlowData[]>([]);
@@ -202,102 +209,39 @@ export const DashboardSection = () => {
   }
 
   return (
-    <section className="container mx-auto px-6 py-16">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Options Flow Dashboard</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Analyze patterns, filter data, and track your trading success with powerful analytics tools.
+    <div className="space-y-6">
+      {/* Missed Opportunities */}
+      <MissedOpportunities selectedDate={selectedDate || new Date()} />
+
+      {/* AI Insights Panel */}
+      <AIInsights />
+
+      {/* Enhanced Flow Table */}
+      <EnhancedFlowTable 
+        flows={filteredFlows} 
+        isLoading={filterLoading}
+        researchFilters={researchFilters}
+      />
+
+      {/* Data Visualization Charts */}
+      <div>
+        <div className="mb-6">
+          <h3 className="text-xl font-bold mb-2 text-white">Flow Analytics & Trends</h3>
+          <p className="text-slate-400">Visual insights into your options flow patterns and market activity.</p>
+        </div>
+        <FlowCharts flows={filteredFlows} />
+      </div>
+
+      {/* AI Chat Interface */}
+      <div>
+        <div className="mb-6">
+          <h3 className="text-xl font-bold mb-2 text-white">AI Research Assistant</h3>
+          <p className="text-slate-400">
+            Ask questions about patterns, get insights, and discover overlooked opportunities.
           </p>
         </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="p-6 bg-gradient-card border-border shadow-terminal">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Flows</p>
-                <p className="text-2xl font-bold text-primary">{stats.totalFlows.toLocaleString()}</p>
-              </div>
-              <BarChart3 className="w-8 h-8 text-primary" />
-            </div>
-          </Card>
-          
-          <Card className="p-6 bg-gradient-card border-border shadow-terminal">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Premium</p>
-                <p className="text-2xl font-bold text-accent">{formatCurrency(stats.totalPremium)}</p>
-              </div>
-              <DollarSign className="w-8 h-8 text-accent" />
-            </div>
-          </Card>
-          
-          <Card className="p-6 bg-gradient-card border-border shadow-terminal">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Unique Tickers</p>
-                <p className="text-2xl font-bold text-warning">{stats.uniqueTickers}</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-warning" />
-            </div>
-          </Card>
-          
-          <Card className="p-6 bg-gradient-card border-border shadow-terminal">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Avg Score</p>
-                <p className="text-2xl font-bold text-info">{stats.avgScore}</p>
-              </div>
-              <Clock className="w-8 h-8 text-info" />
-            </div>
-          </Card>
-        </div>
-
-        {/* AI Insights Panel */}
-        <div className="mb-12">
-          <AIInsights />
-        </div>
-
-        {/* Data Visualization Charts */}
-        <div className="mb-12">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold mb-2">Flow Analytics & Trends</h3>
-            <p className="text-muted-foreground">Visual insights into your options flow patterns and market activity.</p>
-          </div>
-          <FlowCharts flows={filteredFlows} />
-        </div>
-
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Filter Controls */}
-          <FilterControls
-            filters={filters}
-            onFiltersChange={setFilters}
-            onApplyFilters={applyFilters}
-            onClearFilters={clearFilters}
-            isLoading={filterLoading}
-          />
-
-          {/* Filtered Results Table */}
-          <div className="lg:col-span-3">
-            <FlowsTable 
-              flows={filteredFlows} 
-              isLoading={filterLoading}
-            />
-          </div>
-        </div>
-
-        {/* AI Chat Interface */}
-        <div className="mt-12">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">AI-Powered Analysis</h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Ask natural language questions about your options flow data and get intelligent insights powered by pattern recognition and anomaly detection.
-            </p>
-          </div>
-          <AIChat />
-        </div>
+        <AIChat />
       </div>
-    </section>
+    </div>
   );
 };

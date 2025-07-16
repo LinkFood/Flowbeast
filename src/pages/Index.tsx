@@ -1,15 +1,33 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
-import { UploadSection } from "@/components/UploadSection";
+import { ResearchHeader } from "@/components/ResearchHeader";
+import { ResearchSidebar } from "@/components/ResearchSidebar";
 import { DashboardSection } from "@/components/DashboardSection";
+import { UploadSection } from "@/components/UploadSection";
 
 const Index = () => {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [researchFilters, setResearchFilters] = useState<Record<string, unknown>>({});
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-950">
       <Header />
-      <Hero />
-      <UploadSection />
-      <DashboardSection />
+      <ResearchHeader />
+      <div className="flex">
+        <ResearchSidebar 
+          onFiltersChange={setResearchFilters}
+          selectedDate={selectedDate}
+        />
+        <div className="flex-1 overflow-hidden">
+          <div className="p-6">
+            <UploadSection />
+            <DashboardSection 
+              researchFilters={researchFilters}
+              selectedDate={selectedDate}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

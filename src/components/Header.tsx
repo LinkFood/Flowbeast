@@ -13,51 +13,35 @@ export const Header = () => {
   }
 
   return (
-    <header className="bg-gradient-card border-b border-border shadow-terminal">
-      <div className="container mx-auto px-6 py-4">
+    <header className="bg-slate-900 border-b border-slate-800">
+      <div className="container mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-lg shadow-data">
-              <TrendingUp className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Options Flow Analyzer
+              <h1 className="text-lg font-bold text-white">
+                FlowBeast
               </h1>
-              <p className="text-muted-foreground text-sm">Historical Pattern Analysis System</p>
+              <p className="text-slate-400 text-xs">Options Flow Research</p>
             </div>
           </div>
           
           <nav className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <Database className="w-4 h-4 mr-2" />
-              Database
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <Upload className="w-4 h-4 mr-2" />
-              Upload
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Analysis
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              AI Chat
-            </Button>
             {user ? (
               <>
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground mr-2">
+                <div className="flex items-center space-x-2 text-sm text-slate-400 mr-4">
                   <User className="w-4 h-4" />
                   <span>{user.email}</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={signOut}>
+                <Button variant="ghost" size="sm" onClick={signOut} className="text-slate-400 hover:text-white">
                   <LogOut className="w-4 h-4" />
                 </Button>
               </>
             ) : (
               <Link to="/auth">
-                <Button variant="terminal" size="sm">
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                   Sign In
                 </Button>
               </Link>
