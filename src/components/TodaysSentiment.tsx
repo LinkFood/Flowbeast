@@ -44,6 +44,7 @@ export const TodaysSentiment = ({ selectedDate }: TodaysSentimentProps) => {
   const [sentimentData, setSentimentData] = useState<SentimentData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Define the async function first using useCallback
   const analyzeTodaysSentiment = useCallback(async () => {
     if (!user) return;
 
