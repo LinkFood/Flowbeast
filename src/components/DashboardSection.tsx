@@ -27,7 +27,7 @@ interface OptionsFlowData {
 }
 
 interface DashboardSectionProps {
-  researchFilters?: Record<string, unknown>;
+  researchFilters?: any;
   selectedDate?: Date;
 }
 

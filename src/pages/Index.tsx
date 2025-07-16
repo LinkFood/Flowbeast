@@ -7,7 +7,7 @@ import { UploadSection } from "@/components/UploadSection";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [researchFilters, setResearchFilters] = useState<Record<string, unknown>>({});
+  const [researchFilters, setResearchFilters] = useState<any>({});
 
   return (
     <div className="min-h-screen bg-slate-950">

@@ -202,16 +202,16 @@ export function parseCSV(file: File): Promise<ParseResult> {
             }
 
             const record: OptionsFlowRecord = {
-              time_of_trade: parseDateTime(row.time_of_trade),
-              ticker_symbol: row.ticker_symbol.toString().toUpperCase().trim(),
-              premium: parseNumericValue(row.premium) || 0,
-              option_type: normalizeOptionType(row.option_type),
-              trade_type: normalizeTradeType(row.trade_type),
-              score: parseNumericValue(row.score),
-              spot_price: parseNumericValue(row.spot_price),
-              strike_price: parseNumericValue(row.strike_price),
-              implied_volatility: parseNumericValue(row.implied_volatility),
-              open_interest: parseNumericValue(row.open_interest),
+              time_of_trade: parseDateTime(row.time_of_trade as string),
+              ticker_symbol: (row.ticker_symbol as string).toString().toUpperCase().trim(),
+              premium: parseNumericValue(row.premium as string | number) || 0,
+              option_type: normalizeOptionType(row.option_type as string),
+              trade_type: normalizeTradeType(row.trade_type as string),
+              score: parseNumericValue(row.score as string | number),
+              spot_price: parseNumericValue(row.spot_price as string | number),
+              strike_price: parseNumericValue(row.strike_price as string | number),
+              implied_volatility: parseNumericValue(row.implied_volatility as string | number),
+              open_interest: parseNumericValue(row.open_interest as string | number),
             };
 
             // Validate option_type and trade_type
