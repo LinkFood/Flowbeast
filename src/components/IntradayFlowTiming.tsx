@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Area, AreaChart } from 'recharts';
@@ -40,13 +40,7 @@ export const IntradayFlowTiming = ({ selectedDate }: IntradayFlowTimingProps) =>
     afterHoursActivity: boolean;
   } | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      analyzeIntradayTiming();
-    }
-  }, [user, selectedDate, analyzeIntradayTiming]);
-
-  const analyzeIntradayTiming = async () => {
+  const analyzeIntradayTiming = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -174,7 +168,13 @@ export const IntradayFlowTiming = ({ selectedDate }: IntradayFlowTimingProps) =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedDate]);
+
+  useEffect(() => {
+    if (user) {
+      analyzeIntradayTiming();
+    }
+  }, [user, selectedDate, analyzeIntradayTiming]);
 
   const formatCurrency = (value: number) => {
     return `$${value.toFixed(1)}M`;

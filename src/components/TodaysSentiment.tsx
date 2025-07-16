@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -44,13 +44,7 @@ export const TodaysSentiment = ({ selectedDate }: TodaysSentimentProps) => {
   const [sentimentData, setSentimentData] = useState<SentimentData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      analyzeTodaysSentiment();
-    }
-  }, [user, selectedDate, analyzeTodaysSentiment]);
-
-  const analyzeTodaysSentiment = async () => {
+  const analyzeTodaysSentiment = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -155,7 +149,13 @@ export const TodaysSentiment = ({ selectedDate }: TodaysSentimentProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedDate]);
+
+  useEffect(() => {
+    if (user) {
+      analyzeTodaysSentiment();
+    }
+  }, [user, selectedDate, analyzeTodaysSentiment]);
 
   const formatCurrency = (amount: number) => {
     if (amount >= 1000000000) {

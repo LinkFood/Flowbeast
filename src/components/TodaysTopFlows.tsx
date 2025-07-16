@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,13 +51,7 @@ export const TodaysTopFlows = ({ selectedDate }: TodaysTopFlowsProps) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'bullish' | 'bearish' | 'largest' | 'sweeps' | 'blocks'>('largest');
 
-  useEffect(() => {
-    if (user) {
-      analyzeTopFlows();
-    }
-  }, [user, selectedDate, analyzeTopFlows]);
-
-  const analyzeTopFlows = async () => {
+  const analyzeTopFlows = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -134,7 +128,13 @@ export const TodaysTopFlows = ({ selectedDate }: TodaysTopFlowsProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedDate]);
+
+  useEffect(() => {
+    if (user) {
+      analyzeTopFlows();
+    }
+  }, [user, selectedDate, analyzeTopFlows]);
 
   const formatCurrency = (amount: number) => {
     if (amount >= 1000000000) {
