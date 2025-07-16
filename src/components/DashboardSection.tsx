@@ -12,6 +12,9 @@ import { FlowCharts } from "@/components/FlowCharts";
 import { AIChat } from "@/components/AIChat";
 import { AIInsights } from "@/components/AIInsights";
 import { MissedOpportunities } from "@/components/MissedOpportunities";
+import { TodaysSentiment } from "@/components/TodaysSentiment";
+import { TodaysTopFlows } from "@/components/TodaysTopFlows";
+import { IntradayFlowTiming } from "@/components/IntradayFlowTiming";
 
 interface OptionsFlowData {
   id: string;
@@ -210,6 +213,15 @@ export const DashboardSection = ({ researchFilters, selectedDate }: DashboardSec
 
   return (
     <div className="space-y-6">
+      {/* Today's Sentiment Analysis */}
+      <TodaysSentiment selectedDate={selectedDate || new Date()} />
+
+      {/* Today's Top Flows */}
+      <TodaysTopFlows selectedDate={selectedDate || new Date()} />
+
+      {/* Intraday Flow Timing */}
+      <IntradayFlowTiming selectedDate={selectedDate || new Date()} />
+
       {/* Missed Opportunities */}
       <MissedOpportunities selectedDate={selectedDate || new Date()} />
 

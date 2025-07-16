@@ -107,6 +107,7 @@ export const UploadSection = () => {
         for (const batch of batches) {
           const dbRecords = batch.map((record: OptionsFlowRecord) => ({
             user_id: user.id,
+            upload_date: new Date().toISOString().split('T')[0], // Set upload date
             ...record,
           }));
 
