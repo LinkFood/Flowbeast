@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { FilterControls, FilterState } from "@/components/FilterControls";
 import { FlowsTable } from "@/components/FlowsTable";
 import { FlowCharts } from "@/components/FlowCharts";
+import { AIChat } from "@/components/AIChat";
+import { AIInsights } from "@/components/AIInsights";
 
 interface OptionsFlowData {
   id: string;
@@ -252,6 +254,11 @@ export const DashboardSection = () => {
           </Card>
         </div>
 
+        {/* AI Insights Panel */}
+        <div className="mb-12">
+          <AIInsights />
+        </div>
+
         {/* Data Visualization Charts */}
         <div className="mb-12">
           <div className="mb-6">
@@ -280,35 +287,16 @@ export const DashboardSection = () => {
           </div>
         </div>
 
-        {/* AI Chat Preview */}
-        <Card className="mt-12 p-8 bg-gradient-card border-border shadow-terminal">
-          <div className="max-w-3xl mx-auto text-center">
+        {/* AI Chat Interface */}
+        <div className="mt-12">
+          <div className="text-center mb-8">
             <h3 className="text-2xl font-bold mb-4">AI-Powered Analysis</h3>
-            <p className="text-muted-foreground mb-6">
-              Ask natural language questions about your options flow data and get intelligent insights.
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Ask natural language questions about your options flow data and get intelligent insights powered by pattern recognition and anomaly detection.
             </p>
-            
-            <div className="bg-secondary/50 rounded-lg p-6 mb-6 text-left">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">AI</span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm">
-                    "Based on today's data, I found 12 NVDA sweeps above $2M with scores over 0.8. 
-                    Similar patterns in the past 30 days showed a 67% success rate when held for 2-3 days. 
-                    The current implied volatility is 15% below the 30-day average, suggesting potential upside."
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <Button variant="terminal" size="lg">
-              <BarChart3 className="w-5 h-5 mr-2" />
-              Start AI Analysis
-            </Button>
           </div>
-        </Card>
+          <AIChat />
+        </div>
       </div>
     </section>
   );

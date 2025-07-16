@@ -91,7 +91,7 @@ function parseNumericValue(value: string | number): number | undefined {
   if (!value || value === '') return undefined;
   
   // Remove common formatting (commas, dollar signs, etc.)
-  const cleanValue = value.toString().replace(/[\$,\s]/g, '');
+  const cleanValue = value.toString().replace(/[$,\s]/g, '');
   const parsed = parseFloat(cleanValue);
   
   return isNaN(parsed) ? undefined : parsed;
@@ -177,10 +177,10 @@ export function parseCSV(file: File): Promise<ParseResult> {
           });
         }
 
-        results.data.forEach((rawRow: any, index: number) => {
+        results.data.forEach((rawRow: Record<string, unknown>, index: number) => {
           try {
             // Map the raw row to our normalized field names
-            const row: any = {};
+            const row: Record<string, unknown> = {};
             Object.keys(rawRow).forEach(originalHeader => {
               const mappedHeader = headerMapping[originalHeader] || originalHeader;
               row[mappedHeader] = rawRow[originalHeader];
